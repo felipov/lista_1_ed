@@ -3,8 +3,6 @@
 #ifndef RESERVATION_REQUEST_HPP
 #define RESERVATION_REQUEST_HPP
 
-// Definir aqui outras estruturas para o sistema funcionar.
-
 class ReservationRequest {
 
 private:
