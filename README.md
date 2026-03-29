@@ -21,7 +21,10 @@ g++ main.cpp ReservationSystem.cpp ReservationRequest.cpp -o reservation_system
 
 ## Organização dos dados
 
-O sistema funciona com três classes principais:
+O sistema funciona com duas classes principais `ReservationRequest` e `ReservationSystem`, e
+duas classes auxiliares `Reserves` e `Room`.
+
+### Descrição
 
 **ReservationRequest**: Guarda os dados de uma solicitação de reserva (nome da disciplina,
 dia da semana, horário de início, horário de término e número de alunos).
