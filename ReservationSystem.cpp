@@ -17,6 +17,8 @@ Reserves::Reserves(ReservationRequest* request, int capacity){
 }
 
 Reserves::Reserves(const Reserves& other){
+    // Aqui nós criamos um construtor de cópia para a classe Reserves,
+    // a fim de evitar futuros problemas com a alocação dinâmica de memória.
     this->size = other.size;
     this->capacity = other.capacity;
     this->request = new ReservationRequest[this->capacity];
@@ -27,6 +29,10 @@ Reserves::Reserves(const Reserves& other){
 }
 
 Reserves& Reserves::operator = (const Reserves& other){
+    // Como nós estamos gernciando dinamicamente a memória, para evitar
+    // problemas na liberação de memória, criamos um operador de atribuição.
+    // No caso, ele cria uma cópia dos dados, não apenas dos ponteiros, 
+    // evitando um double free no futuro.
     if (this != &other){
 
         ReservationRequest* new_request = new ReservationRequest[other.capacity];
@@ -153,6 +159,9 @@ Rooms::Rooms(Reserves* reserve, std::string* name, int list_capacity, int* room_
 }
 
 Rooms::Rooms(const Rooms& other){
+    // Assim como na classe Reserves, nós criamos um construtor de cópia
+    // para a classe Rooms, a fim de evitar futuros problemas com a alocação
+    // dinâmica de memória.
     this->size = other.size;
     this->list_capacity = other.list_capacity;
     this->reserve = new Reserves[this->list_capacity];
@@ -167,6 +176,8 @@ Rooms::Rooms(const Rooms& other){
 }
 
 Rooms& Rooms::operator = (const Rooms& other){
+    // Aqui nós também criamos um operador, para evitar problemas
+    // futuros como double free e segmentation fault.
     if (this != &other) {
 
         if (this->reserve != nullptr && this->name != nullptr && this->room_capacity != nullptr) {
@@ -255,8 +266,6 @@ void Rooms::resize(int nova_capacidade) {
 }
 
 void Rooms::display(){
-    // std::cout << "Número de salas: " << this->size << std::endl;
-    // std::cout << "Capacidade atual de salas: " << this->list_capacity << std::endl;
     std::cout << std::endl;
     for (int i = 0; i < this->size; i++){
         std::cout << "Nome: " << this->name[i] << std::endl;
