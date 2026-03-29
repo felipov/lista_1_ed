@@ -1,6 +1,8 @@
 #include <iostream>
 #include "ReservationRequest.hpp"
 
+ReservationRequest::ReservationRequest() = default;
+
 ReservationRequest::ReservationRequest(std::string course_name,
         std::string weekday, int start_hour, int end_hour, int student_count){
     this->course_name = course_name;
@@ -8,6 +10,10 @@ ReservationRequest::ReservationRequest(std::string course_name,
     this->start_hour = start_hour;
     this->end_hour = end_hour;
     this->student_count = student_count;
+}
+
+ReservationRequest::~ReservationRequest(){
+    // Não há nada a ser liberado manualmente.
 }
 
 int ReservationRequest::getStartHour(){

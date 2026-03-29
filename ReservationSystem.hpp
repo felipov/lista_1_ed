@@ -3,23 +3,6 @@
 #ifndef RESERVATION_SYSTEM_HPP
 #define RESERVATION_SYSTEM_HPP
 
-class Rooms{
-
-private:
-    ReservationRequest* request;
-    std::string name;
-    int size;
-    int list_capacity;
-    int room_capacity;
-
-public:
-    Rooms(ReservationRequest* request, std::string name, int size, int list_capacity,
-            int room_capacity);
-    ~Rooms();
-    bool append(Rooms* room_list, std::string name, int room_capacity);
-    bool remove(Rooms* room_list, std::string name);
-};
-
 class Reserves{
 private:
     ReservationRequest* request;
@@ -27,10 +10,32 @@ private:
     int capacity;
 
 public:
-    Reserves(ReservationRequest* request, int size, int capacity);
+    Reserves();
+    Reserves(ReservationRequest* request, int capacity);
     ~Reserves();
-    bool append(ReservationRequest request);
-    bool remove(ReservationRequest request);
+    void append(ReservationRequest request);
+    void remove(ReservationRequest request);
+    void resize(int nova_capacidade);
+    void display();
+};
+
+class Rooms{
+
+private:
+    Reserves* reserve;
+    std::string* name;
+    int* room_capacity;
+    int size;
+    int list_capacity;
+
+public:
+    Rooms();
+    Rooms(Reserves* reserve, std::string* name, int list_capacity,
+            int* room_capacity);
+    ~Rooms();
+    void append(std::string name, int room_capacity);
+    void resize(int nova_capacidade);
+    void display();
 };
 
 class ReservationSystem {
@@ -44,7 +49,8 @@ private:
     std::string week[5];
     int week_size;
 
-    // Aqui inicializar um Rooms e um Reserves.
+    Rooms* list_rooms;
+    Reserves* list_reserves;
 
 public:
 
