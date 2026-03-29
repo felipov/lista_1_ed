@@ -3,6 +3,24 @@
 #ifndef RESERVATION_SYSTEM_HPP
 #define RESERVATION_SYSTEM_HPP
 
+class Reserves{
+private:
+    ReservationRequest* request;
+    int size;
+    int capacity;
+
+public:
+    Reserves();
+    Reserves(ReservationRequest* request, int capacity);
+    ~Reserves();
+    void append(ReservationRequest request);
+    void remove(ReservationRequest request);
+    void resize(int nova_capacidade);
+    void display();
+    int getSize();
+    ReservationRequest getRequest(int index);
+};
+
 class Rooms{
 
 private:
@@ -26,24 +44,6 @@ public:
     std::string getName(int index);
 };
 
-class Reserves{
-private:
-    ReservationRequest* request;
-    int size;
-    int capacity;
-
-public:
-    Reserves();
-    Reserves(ReservationRequest* request, int capacity);
-    ~Reserves();
-    void append(ReservationRequest request);
-    void remove(ReservationRequest request);
-    void resize(int nova_capacidade);
-    void display();
-    int getSize();
-    ReservationRequest getRequest(int index);
-};
-
 class ReservationSystem {
 
 private:
@@ -65,8 +65,6 @@ public:
 
     bool reserve(ReservationRequest request);
     bool cancel(std::string course_name);
-
-    void printSchedule();
 
     // Outros métodos utilitários necessários
     // para auxiliar nas funções requisitadas
