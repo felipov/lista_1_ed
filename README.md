@@ -15,7 +15,7 @@ Funcionalidades:
 ## Execução
 ```./reservation_system```
 
-## Organização interna dos dados
+## Organização dos dados
 
 O sistema funciona com três classes principais:
 
