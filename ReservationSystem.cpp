@@ -282,92 +282,6 @@ std::string Rooms::getName(int index){
     return this->name[index];
 }
 
-
-// Funções da classe Reserves
-
-Reserves::Reserves() = default;
-
-Reserves::Reserves(ReservationRequest* request, int capacity){
-    this->request = new ReservationRequest[capacity];
-    for (int i = 0; i < capacity; i++){
-        this->request[i] = request[i];
-    }
-    this->size = 0;
-    this->capacity = capacity;
-}
-
-Reserves::~Reserves(){
-    delete[] this->request;
-}
-
-void Reserves::append(ReservationRequest request){
-    if (this->size == this->capacity) {
-        Reserves::resize(2 * this->capacity);
-    }
-    this->request[this->size] = request;
-    this->size++;
-}
-
-void Reserves::remove(ReservationRequest request){
-    if (this->size <= this->capacity / 2) {
-        Reserves::resize(this->capacity / 2);
-    }
-
-    ReservationRequest* new_request = new ReservationRequest[this->capacity];
-    int critical_value = 0;
-
-    for (int i = 0; i < this->size; i++) {
-        if (this->request[i].getCourseName() != request.getCourseName()) {
-            new_request[i] = this->request[i];
-        } else {
-            critical_value = i;
-            break;
-        }
-    }
-
-    for (int i = critical_value + 1; i < this->size; i++) {
-        new_request[i-1] = this->request[i];
-    }
-    delete[] this->request;
-    this->request = new_request;
-    this->size--;
-}
-
-void Reserves::resize(int new_capacity){
-    ReservationRequest* new_reserves = new ReservationRequest[new_capacity];
-
-    for (int i = 0; i < this->size; i++) {
-        new_reserves[i] = this->request[i];
-    }
-
-    delete[] this->request;
-    this->request = new_reserves;
-    this->capacity = new_capacity;
-}
-
-void Reserves::display(){
-    std::cout << "Número de reservas feitas: " << this->size << std::endl;
-    std::cout << "Capacidade atual de reservas: " << this->capacity << std::endl;
-    for (int i = 0; i < this->size; i++){
-        std::cout << "Reserva:" << std::endl;
-        std::cout << "Nome do curso: " << this->request[i].getCourseName() << std::endl;
-        std::cout << "Dia da semana: " << this->request[i].getWeekday() << std::endl;
-        std::cout << "Horário inicial: " << this->request[i].getStartHour() << "h" << std::endl;
-        std::cout << "Horário final: " << this->request[i].getEndHour() << "h" << std::endl;
-        std::cout << "Quantidade de estudantes: " << this->request[i].getStudentCount() << "h" << std::endl;
-    }
-    std::cout << std::endl;
-}
-
-int Reserves::getSize(){
-    return this->size;
-}
- 
-ReservationRequest Reserves::getRequest(int index){
-    return this->request[index];
-}
-
-
 // Funções da classe ReservationSystem
 
 ReservationSystem::ReservationSystem(int room_count, int* room_capacities){
@@ -415,19 +329,19 @@ bool ReservationSystem::reserve(ReservationRequest request){
         if (this->list_rooms->getRoomCapacity(i) < students) continue;
  
         Reserves& reservas = this->list_rooms->getReserves(i);
-        bool conflito = false;
+        bool conflict = false;
  
         for (int j = 0; j < reservas.getSize(); j++) {
             ReservationRequest existing = reservas.getRequest(j);
             if (existing.getWeekday() == dia) {
                 if (end > existing.getStartHour() && existing.getEndHour() > start) {
-                    conflito = true;
+                    conflict = true;
                     break;
                 }
             }
         }
  
-        if (conflito) continue;
+        if (conflict) continue;
  
         reservas.append(request);
 
@@ -438,12 +352,12 @@ bool ReservationSystem::reserve(ReservationRequest request){
 
 bool ReservationSystem::cancel(std::string course_name){
     for (int i = 0; i < this->list_rooms->getSize(); i++) {
-        Reserves& reservas = this->list_rooms->getReserves(i);
+        Reserves& reserves = this->list_rooms->getReserves(i);
 
-        for (int j = 0; j < reservas.getSize(); j++) {
-            if (reservas.getRequest(j).getCourseName() == course_name) {
-                ReservationRequest req = reservas.getRequest(j);
-                reservas.remove(req);
+        for (int j = 0; j < reserves.getSize(); j++) {
+            if (reserves.getRequest(j).getCourseName() == course_name) {
+                ReservationRequest req = reserves.getRequest(j);
+                reserves.remove(req);
 
                 return true;
             }
@@ -453,23 +367,30 @@ bool ReservationSystem::cancel(std::string course_name){
 }
 
 void ReservationSystem::printSchedule(){
-    std::cout << "\n=== Grade de Reservas ===" << "\n";
+    std::cout << "\nGrade de Reservas" << "\n";
 
     for (int i = 0; i < this->list_rooms->getSize(); i++) {
-        Reserves& reservas = this->list_rooms->getReserves(i);
+        Reserves& reserves = this->list_rooms->getReserves(i);
+
+        if (reserves.getSize() == 0) continue;
 
         std::cout << this->list_rooms->getName(i) << "\n";
         
-        for (int d = 0; d < 5; d++) {
-            bool imprimiu_dia = false;
+        for (int j = 0; j < 5; j++) {
+            std::string dia = this->week[j];
+            bool first = true;
 
-            for (int j = 0; j < reservas.getSize(); j++) {
-                ReservationRequest req = reservas.getRequest(j);
+            for (int k = 0; k < reserves.getSize(); k++) {
+                if (reserves.getRequest(k).getWeekday() != dia) continue;
 
-                if (!imprimiu_dia) {
-                    std::cout << this->week[d] << ":" << std::endl;
-                    imprimiu_dia = true;
+                if (first) {
+                    std::cout << dia << ":" << "\n";
+                    first = false;
                 }
+
+                std::cout << "-> " << reserves.getRequest(k).getStartHour() << "h-"
+                        << reserves.getRequest(k).getEndHour() << "h: "
+                        << reserves.getRequest(k).getCourseName() << "\n";
             }
         }
     }
