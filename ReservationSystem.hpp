@@ -12,6 +12,8 @@ private:
 public:
     Reserves();
     Reserves(ReservationRequest* request, int capacity);
+    Reserves(const Reserves& other);
+    Reserves& operator = (const Reserves& other);
     ~Reserves();
     void append(ReservationRequest request);
     void remove(ReservationRequest request);
@@ -20,6 +22,7 @@ public:
     int getSize();
     ReservationRequest getRequest(int index);
 };
+
 
 class Rooms{
 
@@ -34,6 +37,8 @@ public:
     Rooms();
     Rooms(Reserves* reserve, std::string* name, int list_capacity,
             int* room_capacity);
+    Rooms(const Rooms& other);
+    Rooms& operator = (const Rooms& other);
     ~Rooms();
     void append(std::string name, int room_capacity);
     void resize(int nova_capacidade);
@@ -54,10 +59,9 @@ private:
     // para armazenar e gerenciar as reservas, os horários, ...
     std::string week[5];
 
-    Rooms* list_rooms;
-    Reserves* list_reserves;
-
 public:
+    Reserves* list_reserves;
+    Rooms* list_rooms;
 
     ReservationSystem(int room_count, int* room_capacities);
     ~ReservationSystem();
