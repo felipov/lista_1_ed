@@ -12,17 +12,17 @@ private:
 public:
     Reserves();
     Reserves(ReservationRequest* request, int capacity);
+    Reserves(const Reserves& other);
+    Reserves& operator = (const Reserves& other);
     ~Reserves();
     void append(ReservationRequest request);
     void remove(ReservationRequest request);
     void resize(int nova_capacidade);
     void display();
-<<<<<<< HEAD
     int getSize();
     ReservationRequest getRequest(int index);
-=======
->>>>>>> 51192358b8f2da28393ce635589295330bbf5da9
 };
+
 
 class Rooms{
 
@@ -37,17 +37,16 @@ public:
     Rooms();
     Rooms(Reserves* reserve, std::string* name, int list_capacity,
             int* room_capacity);
+    Rooms(const Rooms& other);
+    Rooms& operator = (const Rooms& other);
     ~Rooms();
     void append(std::string name, int room_capacity);
     void resize(int nova_capacidade);
     void display();
-<<<<<<< HEAD
     int getSize();
     int getRoomCapacity(int index);
     Reserves& getReserves(int index);
     std::string getName(int index);
-=======
->>>>>>> 51192358b8f2da28393ce635589295330bbf5da9
 };
 
 class ReservationSystem {
@@ -61,10 +60,9 @@ private:
     std::string week[5];
     int week_size;
 
-    Rooms* list_rooms;
-    Reserves* list_reserves;
-
 public:
+    Reserves* list_reserves;
+    Rooms* list_rooms;
 
     ReservationSystem(int room_count, int* room_capacities);
     ~ReservationSystem();
@@ -72,11 +70,8 @@ public:
     bool reserve(ReservationRequest request);
     bool cancel(std::string course_name);
 
-<<<<<<< HEAD
-=======
     void printSchedule();
 
->>>>>>> 51192358b8f2da28393ce635589295330bbf5da9
     // Outros métodos utilitários necessários
     // para auxiliar nas funções requisitadas
 };

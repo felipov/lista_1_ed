@@ -1,10 +1,141 @@
 #include <iostream>
+#include <string>
 #include "ReservationSystem.hpp"
+
+
+// Funções da classe Reserves
+Reserves::Reserves(){
+    this->size = 0;
+    this->capacity = 10;
+    this->request = new ReservationRequest[capacity];
+}
+
+Reserves::Reserves(ReservationRequest* request, int capacity){
+    this->request = new ReservationRequest[capacity];
+    this->size = 0;
+    this->capacity = capacity;
+}
+
+Reserves::Reserves(const Reserves& other){
+    this->size = other.size;
+    this->capacity = other.capacity;
+    this->request = new ReservationRequest[this->capacity];
+
+    for (int i = 0; i < this->size; i++) {
+        this->request[i] = other.request[i];
+    }
+}
+
+Reserves& Reserves::operator = (const Reserves& other){
+    if (this != &other){
+
+        ReservationRequest* new_request = new ReservationRequest[other.capacity];
+        for (int i = 0; i < other.size; i++) {
+            new_request[i] = other.request[i];
+        }
+
+        delete[] this->request;
+
+        this->size = other.size;
+        this->capacity = other.capacity;
+        this->request = new_request;
+
+        for (int i = 0; i < this->size; i++) {
+            this->request[i] = other.request[i];
+        }
+    }
+    return *this;
+}
+
+Reserves::~Reserves(){
+    if (this->request != nullptr) {
+        delete[] this->request;
+        this->request = nullptr;
+    }
+}
+
+void Reserves::append(ReservationRequest request){
+    if (this->size == this->capacity) {
+        Reserves::resize(2 * this->capacity);
+    }
+    this->request[this->size] = request;
+    this->size++;
+}
+
+void Reserves::remove(ReservationRequest request){
+
+    int index = -1;
+
+    for (int i = 0; i < this->size; i++) {
+        if (this->request[i].getCourseName() == request.getCourseName()) {
+            index = i;
+            break;
+        }
+    }
+
+    if (index != -1) {
+        for (int i = index; i < this->size - 1; i++) {
+            this->request[i] = this->request[i + 1];
+        }
+
+        this->size--;
+    }
+
+    if (this->capacity > 4 && this->size <= this->capacity / 4) {
+        Reserves::resize(this->capacity / 2);
+    }
+}
+
+void Reserves::resize(int new_capacity){
+    ReservationRequest* new_reserves = new ReservationRequest[new_capacity];
+
+    for (int i = 0; i < this->size; i++) {
+        new_reserves[i] = this->request[i];
+    }
+
+    if (this->request != nullptr) {
+        delete[] this->request;
+        this->request = nullptr;
+    }
+    this->request = new_reserves;
+    this->capacity = new_capacity;
+}
+
+void Reserves::display() {
+    std::cout << "Número de reservas feitas: " << this->size << std::endl;
+    std::cout << "Capacidade atual de reservas: " << this->capacity << std::endl;
+    std::cout << std::endl;
+    std::cout << "Reservas:" << std::endl;
+    for (int i = 0; i < this->size; i++){
+        std::cout << "Nome do curso: " << this->request[i].getCourseName() << std::endl;
+        std::cout << "Dia da semana: " << this->request[i].getWeekday() << std::endl;
+        std::cout << "Horário inicial: " << this->request[i].getStartHour() << "h" << std::endl;
+        std::cout << "Horário final: " << this->request[i].getEndHour() << "h" << std::endl;
+        std::cout << "Quantidade de estudantes: " << this->request[i].getStudentCount() << std::endl;
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+}
+
+int Reserves::getSize(){
+    return this->size;
+}
+ 
+ReservationRequest Reserves::getRequest(int index){
+    return this->request[index];
+}
 
 
 // Funções da classe Rooms
 
-Rooms::Rooms() = default;
+Rooms::Rooms(){
+    this->size = 0;
+    this->list_capacity = 10;
+    this->reserve = new Reserves[list_capacity];
+    this->name = new std::string[list_capacity];
+    this->room_capacity = new int[list_capacity];
+
+}
 
 Rooms::Rooms(Reserves* reserve, std::string* name, int list_capacity, int* room_capacity){
     this->reserve = new Reserves[list_capacity];
@@ -21,21 +152,71 @@ Rooms::Rooms(Reserves* reserve, std::string* name, int list_capacity, int* room_
     this->list_capacity = list_capacity;
 }
 
+Rooms::Rooms(const Rooms& other){
+    this->size = other.size;
+    this->list_capacity = other.list_capacity;
+    this->reserve = new Reserves[this->list_capacity];
+    this->name = new std::string[this->list_capacity];
+    this->room_capacity = new int[this->list_capacity];
+
+    for (int i = 0; i < this->size; i++) {
+        this->reserve[i] = other.reserve[i];
+        this->name[i] = other.name[i];
+        this->room_capacity[i] = other.room_capacity[i];
+    }
+}
+
+Rooms& Rooms::operator = (const Rooms& other){
+    if (this != &other) {
+
+        if (this->reserve != nullptr && this->name != nullptr && this->room_capacity != nullptr) {
+            delete[] this->reserve;
+            delete[] this->name;
+            delete[] this->room_capacity;
+            this->reserve = nullptr;
+            this->name = nullptr;
+            this->room_capacity = nullptr;
+        }
+
+        this->size = other.size;
+        this->list_capacity = other.list_capacity;
+
+        this->reserve = new Reserves[list_capacity];
+        this->name = new std::string[list_capacity];
+        this->room_capacity = new int[list_capacity];
+
+        for (int i = 0; i < this->size; i++) {
+            this->reserve[i] = other.reserve[i];
+            this->name[i] = other.name[i];
+            this->room_capacity[i] = other.room_capacity[i];
+        }
+    }
+
+    return *this;
+}
+
 Rooms::~Rooms(){
-    delete[] this->reserve;
-    delete[] this->name;
-    delete[] this->room_capacity;
+    if (this->reserve != nullptr) {
+        delete[] this->reserve;
+        this->reserve = nullptr;
+    }
+
+    if (this->name != nullptr) {
+        delete[] this->name;
+        this->name = nullptr;
+    }
+
+    if (this->room_capacity != nullptr) {
+        delete[] this->room_capacity;
+        this->room_capacity = nullptr;
+    }
 }
 
 void Rooms::append(std::string name, int room_capacity){
     if (this->size == this->list_capacity) {
         Rooms::resize(2 * this->list_capacity);
     }
-<<<<<<< HEAD
     this->reserve[this->size] = Reserves();
-=======
-    this->reserve[this->size] = reserve[this->size];
->>>>>>> 51192358b8f2da28393ce635589295330bbf5da9
     this->name[this->size] = name;
     this->room_capacity[this->size] = room_capacity;
     this->size++;
@@ -46,36 +227,45 @@ void Rooms::resize(int nova_capacidade) {
     std::string* new_name = new std::string[nova_capacidade];
     int* new_room_capacity = new int[nova_capacidade];
 
-    for (int i = 0; i < this->list_capacity; i++) {
+    for (int i = 0; i < this->size; i++) {
        new_reserve[i] = this->reserve[i];
        new_name[i] = this->name[i];
        new_room_capacity[i] = this->room_capacity[i];
     }
 
-    delete[] this->reserve;
-    delete[] this->name;
-    delete[] this->room_capacity;
+    if (this->reserve != nullptr){
+        delete[] this->reserve;
+        this->reserve = nullptr;
+    }
+
+    if (this->name != nullptr) {
+        delete[] this->name;
+        this->reserve = nullptr;
+    }
+
+    if (this->room_capacity != nullptr) {
+        delete[] this->room_capacity;
+        this->room_capacity = nullptr;
+    }
 
     this->reserve = new_reserve;
     this->name = new_name;
     this->room_capacity = new_room_capacity;
-<<<<<<< HEAD
     this->list_capacity = nova_capacidade;
-=======
->>>>>>> 51192358b8f2da28393ce635589295330bbf5da9
 }
 
 void Rooms::display(){
-    std::cout << "Número de salas: " << this->size << std::endl;
-    std::cout << "Capacidade atual de salas: " << this->list_capacity << std::endl;
+    // std::cout << "Número de salas: " << this->size << std::endl;
+    // std::cout << "Capacidade atual de salas: " << this->list_capacity << std::endl;
+    std::cout << std::endl;
     for (int i = 0; i < this->size; i++){
         std::cout << "Nome: " << this->name[i] << std::endl;
         std::cout << "Capacidade da sala: " << this->room_capacity[i] << std::endl;
+        this->getReserves(i).display();
     }
     std::cout << std::endl;
 }
 
-<<<<<<< HEAD
 int Rooms::getSize(){
     return this->size;
 }
@@ -91,116 +281,6 @@ Reserves& Rooms::getReserves(int index){
 std::string Rooms::getName(int index){
     return this->name[index];
 }
-=======
-
->>>>>>> 51192358b8f2da28393ce635589295330bbf5da9
-
-
-// Funções da classe Reserves
-
-Reserves::Reserves() = default;
-
-Reserves::Reserves(ReservationRequest* request, int capacity){
-    this->request = new ReservationRequest[capacity];
-    for (int i = 0; i < capacity; i++){
-        this->request[i] = request[i];
-    }
-    this->size = 0;
-    this->capacity = capacity;
-}
-
-Reserves::~Reserves(){
-    delete[] this->request;
-}
-
-void Reserves::append(ReservationRequest request){
-    if (this->size == this->capacity) {
-        Reserves::resize(2 * this->capacity);
-    }
-    this->request[this->size] = request;
-    this->size++;
-}
-
-void Reserves::remove(ReservationRequest request){
-    if (this->size <= this->capacity / 2) {
-        Reserves::resize(this->capacity / 2);
-    }
-
-    ReservationRequest* new_request = new ReservationRequest[this->capacity];
-    int critical_value = 0;
-
-    for (int i = 0; i < this->size; i++) {
-        if (this->request[i].getCourseName() != request.getCourseName()) {
-            new_request[i] = this->request[i];
-<<<<<<< HEAD
-        } else {
-=======
-        } else if (this->request[i].getCourseName() == request.getCourseName()) {
->>>>>>> 51192358b8f2da28393ce635589295330bbf5da9
-            critical_value = i;
-            break;
-        }
-    }
-
-    for (int i = critical_value + 1; i < this->size; i++) {
-<<<<<<< HEAD
-        new_request[i-1] = this->request[i];
-    }
-    delete[] this->request;
-    this->request = new_request;
-    this->size--;
-=======
-        new_request[i] = this->request[i];
-    }
-    delete[] this->request;
-    this->request = new_request;
->>>>>>> 51192358b8f2da28393ce635589295330bbf5da9
-}
-
-void Reserves::resize(int new_capacity){
-    ReservationRequest* new_reserves = new ReservationRequest[new_capacity];
-
-<<<<<<< HEAD
-    for (int i = 0; i < this->size; i++) {
-=======
-    for (int i = 0; i < this->capacity; i++) {
->>>>>>> 51192358b8f2da28393ce635589295330bbf5da9
-        new_reserves[i] = this->request[i];
-    }
-
-    delete[] this->request;
-    this->request = new_reserves;
-<<<<<<< HEAD
-    this->capacity = new_capacity;
-=======
->>>>>>> 51192358b8f2da28393ce635589295330bbf5da9
-}
-
-void Reserves::display() {
-    std::cout << "Número de reservas feitas: " << this->size << std::endl;
-    std::cout << "Capacidade atual de reservas: " << this->capacity << std::endl;
-    for (int i = 0; i < this->size; i++){
-        std::cout << "Reserva:" << std::endl;
-        std::cout << "Nome do curso: " << this->request[i].getCourseName() << std::endl;
-        std::cout << "Dia da semana: " << this->request[i].getWeekday() << std::endl;
-        std::cout << "Horário inicial: " << this->request[i].getStartHour() << "h" << std::endl;
-        std::cout << "Horário final: " << this->request[i].getEndHour() << "h" << std::endl;
-        std::cout << "Quantidade de estudantes: " << this->request[i].getStudentCount() << "h" << std::endl;
-    }
-    std::cout << std::endl;
-}
-
-<<<<<<< HEAD
-int Reserves::getSize(){
-    return this->size;
-}
- 
-ReservationRequest Reserves::getRequest(int index){
-    return this->request[index];
-}
-=======
-
->>>>>>> 51192358b8f2da28393ce635589295330bbf5da9
 
 
 // Funções da classe ReservationSystem
@@ -219,16 +299,24 @@ ReservationSystem::ReservationSystem(int room_count, int* room_capacities){
     this->week[4] = "sexta";
 
     this->week_size = 5;
-    this->list_rooms = new Rooms;
-    this->list_reserves = new Reserves;
+    this->list_rooms = new Rooms();
+
+    for (int i = 0; i < room_count; i++) {
+        std::string name = "Sala " + std::to_string(i + 1);
+        this->list_rooms->append(name, room_capacities[i]);
+    }
 
 }
 
 ReservationSystem::~ReservationSystem(){
-    delete[] this->room_capacities;
-<<<<<<< HEAD
-    delete this->list_rooms;
-    delete this->list_reserves;
+    if (this->room_capacities != nullptr) {
+        delete[] this->room_capacities;
+        this->room_capacities = nullptr;
+    }
+    if (this->list_rooms != nullptr) {
+        delete this->list_rooms;
+        this->list_rooms = nullptr;
+    }
 }
 
 
@@ -258,7 +346,6 @@ bool ReservationSystem::reserve(ReservationRequest request){
         if (conflito) continue;
  
         reservas.append(request);
-        this->list_reserves->append(request);
 
         return true;
     }
@@ -273,7 +360,6 @@ bool ReservationSystem::cancel(std::string course_name){
             if (reservas.getRequest(j).getCourseName() == course_name) {
                 ReservationRequest req = reservas.getRequest(j);
                 reservas.remove(req);
-                this->list_reserves->remove(req);
 
                 return true;
             }
@@ -281,12 +367,3 @@ bool ReservationSystem::cancel(std::string course_name){
     }
     return false;
 }
-=======
-    delete[] this->list_rooms;
-    delete[] this->list_reserves;
-}
-
-bool ReservationSystem::reserve(ReservationRequest request){
-    return false;
-}
->>>>>>> 51192358b8f2da28393ce635589295330bbf5da9
