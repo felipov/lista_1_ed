@@ -353,9 +353,13 @@ bool ReservationSystem::reserve(ReservationRequest request){
         if (conflict) continue;
  
         reservas.append(request);
-
+        std::cout << "\nReserva realizada com sucesso!\n"
+                  << "  " << "Disciplina: " << request.getCourseName() << "\n"
+                  << "  " << "Sala: " << this->list_rooms->getName(s) << "\n"
+                  << "  " << "Dia e Hora: " << dia << " das " << start << "h ate " << end << "h.\n";
         return true;
     }
+    std::cout << "\nNão ha salas disponiveis para: " << request.getCourseName() << "\n";
     return false;
 }
 
@@ -368,15 +372,17 @@ bool ReservationSystem::cancel(std::string course_name){
                 ReservationRequest req = reserves.getRequest(r);
                 reserves.remove(req);
 
+                std::cout << "\nReserva cancelada: " << course_name << "\n";
                 return true;
             }
         }
     }
+    std::cout << "\nDisciplina nao encontrada: " << course_name << "\n";
     return false;
 }
 
 void ReservationSystem::printSchedule(){
-    std::cout << "\nGrade de Reservas" << "\n";
+    std::cout << "\n------------- Grade de Reservas -------------" << "\n";
 
     for (int s = 0; s < this->list_rooms->getSize(); s++) {
         Reserves& reserves = this->list_rooms->getReserves(s);
@@ -393,14 +399,15 @@ void ReservationSystem::printSchedule(){
                 if (reserves.getRequest(r).getWeekday() != dia) continue;
 
                 if (first) {
-                    std::cout << dia << ":" << "\n";
+                    std::cout << "  " << dia << ":" << "\n";
                     first = false;
                 }
 
-                std::cout << "-> " << reserves.getRequest(r).getStartHour() << "h-"
+                std::cout << "      " << reserves.getRequest(r).getStartHour() << "h-"
                         << reserves.getRequest(r).getEndHour() << "h: "
                         << reserves.getRequest(r).getCourseName() << "\n";
             }
         }
     }
+    std::cout << "-----------------------------------------------\n";
 }
