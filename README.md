@@ -10,12 +10,16 @@ Funcionalidades:
 - Exibir a grade de reservas por sala
 
 ## Compilação
-```g++ main.cpp ReservationSystem.cpp ReservationRequest.cpp -o reservation_system```
+```bash
+g++ main.cpp ReservationSystem.cpp ReservationRequest.cpp -o reservation_system
+```
 
 ## Execução
-```./reservation_system```
+```bash
+./reservation_system
+```
 
-## Organização interna dos dados
+## Organização dos dados
 
 O sistema funciona com três classes principais:
 
